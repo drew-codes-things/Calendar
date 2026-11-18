@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#19191c">
+<title>Calendar</title>
+<link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/app.css">
+<script src="/static/dates.js" defer></script>
+<script src="/static/rules.js" defer></script>
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+</svg>
+
+<header class="topbar">
+  <button class="icon-btn menu-btn" type="button" id="menu-btn" aria-label="Calendars and settings" aria-expanded="false">
+    <svg class="icon"><use href="#i-menu"/></svg>
+  </button>
+  <a class="brand" href="/" aria-label="Calendar home">
+    <img src="/static/icon.svg" alt="" width="28" height="28">
+    <span class="brand-name">Calendar</span>
+  </a>
+  <button class="btn ghost" type="button" id="today-btn">Today</button>
+  <div class="steppers">
+    <button class="icon-btn" type="button" id="prev-btn" aria-label="Earlier"><svg class="icon"><use href="#i-left"/></svg></button>
+    <button class="icon-btn" type="button" id="next-btn" aria-label="Later"><svg class="icon"><use href="#i-right"/></svg></button>
+  </div>
+  <h1 class="range-title" id="range-title" aria-live="polite"></h1>
+  <span class="spacer"></span>
+  <div class="view-switch" role="group" aria-label="View">
+    <button class="seg" type="button" data-view="month" aria-pressed="false">Month</button>
+    <button class="seg" type="button" data-view="week" aria-pressed="false">Week</button>
+    <button class="seg" type="button" data-view="day" aria-pressed="false">Day</button>
+    <button class="seg" type="button" data-view="agenda" aria-pressed="false">Agenda</button>
+  </div>
+  <button class="icon-btn" type="button" id="settings-btn" aria-label="Settings" title="Settings"><svg class="icon"><use href="#i-gear"/></svg></button>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Calendars">
+    <button class="btn create-btn" type="button" id="create-btn"><svg class="icon"><use href="#i-plus"/></svg> New event</button>
+    <div class="side-head">
+      <h2 class="section-title">Calendars</h2>
+      <button class="icon-btn small" type="button" id="new-calendar" title="New calendar" aria-label="New calendar"><svg class="icon"><use href="#i-plus"/></svg></button>
+    </div>
+    <ul class="calendar-list" id="calendar-list"></ul>
+    <div class="side-tools">
+      <button class="btn ghost" type="button" id="import-btn">Import .ics</button>
+      <a class="btn ghost" id="export-link" href="/api/export.ics" download>Export .ics</a>
+    </div>
+    <p class="side-note" id="reminder-note"></p>
+  </nav>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <main class="content">
+    <form id="quick-add" class="quick-add" autocomplete="off">
+      <label class="visually-hidden" for="quick-text">Quick add an event</label>
+      <input id="quick-text" class="quick-text" placeholder="Quick add: dinner with mum friday 7pm" maxlength="500">
+      <button class="btn send" type="submit" id="quick-submit">Add</button>
+      <p class="quick-preview" id="quick-preview" aria-live="polite"></p>
+    </form>
+    <div class="banner" id="banner" role="status" hidden>
+      <span id="banner-text"></span>
+      <button class="icon-btn small" type="button" id="banner-close" aria-label="Dismiss"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+    <section id="view" class="view" aria-live="polite"></section>
+  </main>
+</div>
+
+<button class="fab" type="button" id="fab" aria-label="New event"><svg class="icon"><use href="#i-plus"/></svg></button>
+<input id="import-file" type="file" accept="text/calendar,.ics" hidden>
+
+<dialog class="dialog" id="editor" aria-labelledby="editor-heading">
+  <form method="dialog" id="editor-form" novalidate>
+    <h2 class="visually-hidden" id="editor-heading">Event</h2>
+    <input class="editor-title" id="ed-title" placeholder="Add title" maxlength="500" required aria-label="Title">
+    <p class="editor-note" id="ed-note" hidden></p>
+    <div class="editor-grid">
+      <label class="field">Calendar<select id="ed-calendar"></select></label>
+      <label class="field check-field"><input type="checkbox" id="ed-allday"> All day</label>
+      <label class="field">Starts<input type="date" id="ed-start-date" required></label>
+      <label class="field time-field">Time<input type="time" id="ed-start-time" step="300"></label>
+      <label class="field">Ends<input type="date" id="ed-end-date" required></label>
+      <label class="field time-field">Time<input type="time" id="ed-end-time" step="300"></label>
+    </div>
+    <fieldset class="repeat-box" id="repeat-box">
+      <legend class="visually-hidden">Repeat</legend>
+      <label class="field">Repeat
+        <select id="ed-repeat">
+          <option value="">Does not repeat</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+          <option value="custom" hidden>Custom rule from another device</option>
+        </select>
+      </label>
+      <div class="repeat-more" id="repeat-more" hidden>
+        <label class="field narrow">Every<input type="number" id="ed-interval" min="1" max="99" value="1"></label>
+        <span class="unit" id="ed-unit">weeks</span>
+        <div class="day-toggles" id="ed-weekdays" role="group" aria-label="On these days"></div>
+        <label class="field" id="ed-monthly-wrap">On<select id="ed-monthly"></select></label>
+        <label class="field">Ends
+          <select id="ed-ends">
+            <option value="never">Never</option>
+            <option value="until">On a date</option>
+            <option value="count">After a number of times</option>
+          </select>
+        </label>
+        <label class="field" id="ed-until-wrap" hidden>Last date<input type="date" id="ed-until"></label>
+        <label class="field narrow" id="ed-count-wrap" hidden>Times<input type="number" id="ed-count" min="1" max="999" value="10"></label>
+      </div>
+    </fieldset>
+    <label class="field">Location<input id="ed-location" maxlength="500" placeholder="Add a place"></label>
+    <label class="field">Notes<textarea id="ed-notes" maxlength="10000" rows="3" placeholder="Add notes"></textarea></label>
+    <div class="reminders-box">
+      <span class="field-label">Reminders</span>
+      <ul class="reminder-list" id="ed-reminders"></ul>
+      <button class="btn ghost small-btn" type="button" id="ed-add-reminder">Add a reminder</button>
+    </div>
+    <p class="form-error" id="ed-error" role="alert" hidden></p>
+    <div class="dialog-actions">
+      <button class="btn" type="button" id="ed-delete">Delete</button>
+      <span class="spacer"></span>
+      <button class="btn ghost" type="button" id="ed-cancel">Cancel</button>
+      <button class="btn send" type="submit" id="ed-save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dialog small" id="scope">
+  <form method="dialog">
+    <h2 class="dialog-title" id="scope-title">Change a repeating event</h2>
+    <p class="dialog-text" id="scope-text"></p>
+    <div class="dialog-actions stacked">
+      <button class="btn ghost" value="one" id="scope-one">Only this date</button>
+      <button class="btn ghost" value="all" id="scope-all">All dates</button>
+      <button class="btn ghost" value="cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dialog small" id="confirm">
+  <form method="dialog">
+    <h2 class="dialog-title" id="confirm-title"></h2>
+    <p class="dialog-text" id="confirm-text"></p>
+    <div class="dialog-actions">
+      <button class="btn ghost" value="cancel">Cancel</button>
+      <button class="btn" value="ok" id="confirm-ok"></button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="calendar-dialog">
+  <form method="dialog" id="calendar-form" novalidate>
+    <h2 class="dialog-title" id="calendar-heading">New calendar</h2>
+    <label class="field">Name<input id="cal-name" maxlength="100" required></label>
+    <div class="field">Colour<div class="swatches" id="cal-swatches" role="radiogroup" aria-label="Colour"></div></div>
+    <p class="form-error" id="cal-error" role="alert" hidden></p>
+    <div class="dialog-actions">
+      <button class="btn" type="button" id="cal-delete" hidden>Delete calendar</button>
+      <span class="spacer"></span>
+      <button class="btn ghost" value="cancel" formnovalidate>Cancel</button>
+      <button class="btn send" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="import-dialog">
+  <form method="dialog" id="import-form">
+    <h2 class="dialog-title">Import an .ics file</h2>
+    <p class="dialog-text" id="import-file-name"></p>
+    <label class="field">Into<select id="import-calendar"></select></label>
+    <p class="dialog-text" id="import-result" role="status"></p>
+    <div class="dialog-actions">
+      <button class="btn ghost" value="cancel">Close</button>
+      <button class="btn send" type="button" id="import-go">Import</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dialog wide" id="settings">
+  <form method="dialog">
+    <h2 class="dialog-title">Settings</h2>
+
+    <section class="settings-part">
+      <h3 class="section-title">Reminders</h3>
+      <p class="dialog-text" id="arty-status"></p>
+      <div class="row-actions">
+        <button class="btn ghost" type="button" id="arty-link">Send reminders through Arty</button>
+        <button class="btn ghost" type="button" id="arty-test" hidden>Send a test</button>
+        <button class="btn ghost" type="button" id="arty-unlink" hidden>Stop using Arty</button>
+      </div>
+      <p class="code-line" id="arty-code" hidden></p>
+      <p class="dialog-text" id="browser-status"></p>
+      <button class="btn ghost" type="button" id="browser-allow">Allow notifications in this browser</button>
+    </section>
+
+    <section class="settings-part">
+      <h3 class="section-title">Phone sync (CalDAV)</h3>
+      <p class="dialog-text" id="caldav-status"></p>
+      <dl class="caldav-facts">
+        <dt>Server</dt><dd><code id="caldav-url"></code></dd>
+        <dt>User name</dt><dd><code id="caldav-user"></code></dd>
+        <dt>Password</dt><dd>an app password from below, one per device</dd>
+      </dl>
+      <details class="how-to">
+        <summary>How to add it to a phone</summary>
+        <p><strong>Android:</strong> install DAVx5, add an account with "Login with URL and user name", use the server, user name and app password above, then pick the calendars to sync.</p>
+        <p><strong>iPhone:</strong> Settings, Calendar, Accounts, Add Account, Other, Add CalDAV Account. Server: the host name from the server address above, without https:// or /dav/, then the user name and app password.</p>
+      </details>
+      <ul class="password-list" id="password-list"></ul>
+      <div class="new-password">
+        <label class="field grow">New app password for<input id="pw-name" maxlength="80" placeholder="My phone"></label>
+        <button class="btn ghost" type="button" id="pw-create">Make password</button>
+      </div>
+      <div class="fresh-password" id="pw-fresh" hidden>
+        <p class="dialog-text">Type or copy it into the device now. It is shown only this once.</p>
+        <p class="code-line"><code id="pw-value"></code> <button class="btn ghost small-btn" type="button" id="pw-copy">Copy</button></p>
+      </div>
+    </section>
+
+    <section class="settings-part">
+      <h3 class="section-title">Keyboard</h3>
+      <dl class="keys">
+        <dt><kbd>t</kbd></dt><dd>Today</dd>
+        <dt><kbd>j</kbd> <kbd>k</kbd></dt><dd>Later, earlier</dd>
+        <dt><kbd>m</kbd> <kbd>w</kbd> <kbd>d</kbd> <kbd>a</kbd></dt><dd>Month, week, day, agenda</dd>
+        <dt><kbd>n</kbd></dt><dd>New event</dd>
+        <dt><kbd>/</kbd></dt><dd>Quick add</dd>
+      </dl>
+    </section>
+    <p class="dialog-text faint" id="version-line"></p>
+    <div class="dialog-actions">
+      <button class="btn send" value="close">Done</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+[Unit]
+Description=Calendar (web app, CalDAV gate and reminders)
+After=network.target calendar-store.service
+Wants=calendar-store.service
+
+[Service]
+Type=simple
+User=calendar
+Group=calendar
+WorkingDirectory=/opt/calendar
+EnvironmentFile=/etc/calendar/calendar.env
+ExecStart=/opt/calendar/.venv/bin/python -m calendarapp
+Restart=on-failure
+RestartSec=3
+RestartPreventExitStatus=2
+MemoryMax=256M
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/calendar
+
+[Install]
+WantedBy=multi-user.target
