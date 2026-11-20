@@ -217,7 +217,7 @@ class ReminderDesk:
         return sent
 
     def _deliver(self, key: str, title: str, message: str) -> None:
-        result, retry = self.notifier.deliver(f"Calendar: {title}", message)
+        result, retry = self.notifier.deliver(f"Starfire Calendar: {title}", message)
         with self.database.connect(immediate=True) as connection:
             connection.execute("UPDATE reminders_sent SET arty_result = ?, arty_attempts = arty_attempts + 1, arty_retry = ? "
                                "WHERE reminder_key = ?", (result, 1 if retry else 0, key))

@@ -20,7 +20,7 @@ from .transfer import MAX_IMPORT_BYTES, MAX_IMPORT_EVENTS, export_calendars, imp
 from .when import parse_day
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
-APP_NAME = "Calendar"
+APP_NAME = "Starfire Calendar"
 MAX_REQUEST_BYTES = MAX_IMPORT_BYTES + 64 * 1024
 MAX_ID_DIGITS = 18
 CSRF_HEADER = "X-CSRF-Token"
@@ -313,7 +313,7 @@ def create_app(book: EventBook, passwords: AppPasswords, desk: ReminderDesk, not
 
     @app.post("/api/arty/test")
     def test_arty():
-        result = notifier.send("Calendar: test reminder", "Reminders from your calendar will arrive like this.")
+        result = notifier.send("Starfire Calendar: test reminder", "Reminders from your calendar will arrive like this.")
         return jsonify({"result": result})
 
     return app

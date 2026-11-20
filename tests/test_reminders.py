@@ -75,7 +75,7 @@ def test_linked_reminders_go_to_arty_with_the_calendar_category(book, home, desk
     add(book, home)
     clock.set(at_utc(2026, 11, 13, 10, 15, 5))
     desk.run_once()
-    assert fake.sent == [("/v1/notify", {"title": "Calendar: Dentist", "message": "Friday 13 November, 10:30 to 11:00",
+    assert fake.sent == [("/v1/notify", {"title": "Starfire Calendar: Dentist", "message": "Friday 13 November, 10:30 to 11:00",
                                          "category": "calendar"}, "arty_dev_secret")]
     assert desk.feed(0)[0][0]["artyResult"] == "sent to Updates"
 

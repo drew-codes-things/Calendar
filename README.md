@@ -1,6 +1,6 @@
 <div align="center">
 
-# Calendar
+# Starfire Calendar
 
 **Your own free take on Google Calendar. Month, week, day and agenda views, several calendars, repeating events, reminders, .ics import and export, a quick add line that understands "dinner with mum friday 7pm", and CalDAV sync so the phone's own calendar app shows the same events.**
 
@@ -11,17 +11,17 @@
 
 </div>
 
-![Calendar showing November 2026 in the month view with three calendars, repeating events and an all-day event](screenshot.png)
+![Starfire Calendar showing November 2026 in the month view with three calendars, repeating events and an all-day event](screenshot.png)
 
 ---
 
 ## Overview
 
-Calendar is a small self-hosted calendar. It has its own sign-in for one
+Starfire Calendar is a small self-hosted calendar. It has its own sign-in for one
 owner account, so a copy runs on its own. Like Tasks, Keep Notes and Read
 Later it can also sit behind a sign-in proxy: the author runs it behind the
 starfire sign-in, where Caddy checks the sign-in, then passes the request
-to Calendar on `127.0.0.1`.
+to Starfire Calendar on `127.0.0.1`.
 
 It runs on one machine on its own (see "Run it locally"). The files for
 running it on a server behind Caddy are in `deploy/` and `deploy.sh`.
@@ -143,7 +143,7 @@ The app also checks every 30 seconds for reminders that are due (looking up
 to 29 days ahead, and up to 10 minutes late after a restart), sends each one
 once, and:
 
-- **always** shows it in any open Calendar page, as a banner and, once you
+- **always** shows it in any open Starfire Calendar page, as a banner and, once you
   allow it in Settings, as a browser notification. The page has to be open
   in some tab for this.
 - **when linked to Arty**, also sends it to Arty's brain (`POST /v1/notify`,
@@ -298,7 +298,7 @@ It does not start again after a reboot; run the first command again.
 
 ## First run and sign-in
 
-Calendar has its own sign-in, switched on by default (`AUTH_MODE=builtin`).
+Starfire Calendar has its own sign-in, switched on by default (`AUTH_MODE=builtin`).
 There is one owner account and no sign-up page.
 
 1. Start it (`./run-local.sh`) and open
@@ -437,11 +437,11 @@ database with SQLite's online backup) on the server.
 
 ## Running it on a server
 
-On that server Calendar trusts the gate instead of its own sign-in:
+On that server Starfire Calendar trusts the gate instead of its own sign-in:
 `deploy/calendar.env` sets `AUTH_MODE=proxy` and
 `TRUSTED_PROXIES=127.0.0.1,::1`.
 
-`deploy.sh` installs Calendar into a Proxmox container that already runs
+`deploy.sh` installs Starfire Calendar into a Proxmox container that already runs
 Caddy and the starfire sign-in, reached with `ssh` and `pct`. `apply` checks
 the Caddy block with `caddy validate` before every reload and puts the old
 Caddyfile back if it fails.
@@ -453,7 +453,7 @@ Copy `deploy/site.env.example` and fill it in:
 |---|---|
 | `PROXMOX` | The ssh host name of the Proxmox machine. |
 | `CT` | The number of the container that runs Caddy. |
-| `SITE_HOST` | The host name Calendar is served on, like `calendar.example.com`. |
+| `SITE_HOST` | The host name Starfire Calendar is served on, like `calendar.example.com`. |
 | `SIGNED_IN_USER` | The starfire admin account name; Caddy passes it on and it becomes `ALLOWED_USERS`. |
 | `TUNNEL_PEER` | The address cloudflared reaches Caddy from; `/dav` is only let in from there. |
 | `CALDAV_USER` | The CalDAV user name written into the container's env file on a first install. |

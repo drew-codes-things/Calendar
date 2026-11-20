@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from conftest import OWNER
@@ -16,6 +18,18 @@ def events(owner, first="2026-11-01", last="2026-12-01"):
     answer = owner.get(f"/api/events?from={first}&to={last}")
     assert answer.status_code == 200, answer.get_json()
     return answer.get_json()["events"]
+
+
+def test_the_page_is_named_starfire_calendar(owner):
+    page = owner.get("/").get_data(as_text=True)
+    assert "<title>Starfire Calendar</title>" in page
+    assert 'aria-label="Starfire Calendar home"' in page
+    assert '<span class="brand-name">Starfire Calendar</span>' in page
+
+
+def test_the_version_line_names_starfire_calendar():
+    script = (Path(__file__).resolve().parent.parent / "calendarapp" / "static" / "app.js").read_text()
+    assert "`Starfire Calendar ${state.session.version}, times in ${state.session.timeZone}`" in script
 
 
 def test_health_is_public_and_checks_the_store(client):
@@ -132,6 +146,13 @@ def test_export_is_an_attachment(owner):
 def test_arty_link_without_an_address_says_so(owner):
     assert owner.post("/api/arty/link").status_code == 409
     assert owner.post("/api/arty/test").get_json() == {"result": "not linked"}
+
+
+def test_the_arty_test_reminder_is_titled_starfire_calendar(owner, monkeypatch):
+    sent = []
+    monkeypatch.setattr("calendarapp.reminders.ArtyNotifier.send", lambda self, title, message: sent.append(title) or "sent")
+    assert owner.post("/api/arty/test").get_json() == {"result": "sent"}
+    assert sent == ["Starfire Calendar: test reminder"]
 
 
 def test_a_save_or_delete_from_a_stale_page_is_refused(owner):

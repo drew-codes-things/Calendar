@@ -1030,7 +1030,7 @@ async function openSettings() {
   byId('pw-fresh').hidden = true;
   byId('pw-value').textContent = '';
   byId('arty-code').hidden = true;
-  byId('version-line').textContent = `Calendar ${state.session.version}, times in ${state.session.timeZone}`;
+  byId('version-line').textContent = `Starfire Calendar ${state.session.version}, times in ${state.session.timeZone}`;
   renderArty();
   renderBrowserStatus();
   byId('settings').showModal();
